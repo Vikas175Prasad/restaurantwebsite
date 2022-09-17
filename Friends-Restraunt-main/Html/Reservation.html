@@ -9,6 +9,20 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <!-- Include Moment.js CDN -->
+   <script src="https://momentjs.com/downloads/moment.min.js" type="text/javascript"></script>
+<script src="https://momentjs.com/downloads/moment-timezone-with-data.min.js" type="text/javascript"></script>
+    </script>
+ 
+    <!-- Include Bootstrap DateTimePicker CDN -->
+    <link
+        href=
+"https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css"
+        rel="stylesheet">
+ 
+    <script src=
+"https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js">
+        </script>
     <title>Restraunt Reservation</title>
     <script src="https://kit.fontawesome.com/a740978d7b.js" crossorigin="anonymous"></script>
     <style>
@@ -29,30 +43,31 @@
                 <div class="row">
                   <div class="col-md-9 col-lg-8 mx-auto">
                     <h3 class="login-heading mb-4"><a href="../Html/home.html" style="color: rgb(53, 51, 50);text-decoration: none;font-family: 'Pacifico', cursive;" >Friends & Family  <i class="fas fa-pizza-slice" style="color: coral;"></i></a></h3>
-                    <form method="post" action="../Html/home.html" onSubmit="return validateForm();">
+                    <form method="post" action="../Html/home.html" id="reservation-form" >
                         <div style="width: 400px;">
                         </div>
                         <div style="padding-bottom: 18px;font-size : 18px;">We would be glad to reserve a table for you at our restaurant!</div>
                         <div style="padding-bottom: 18px;">Name<span style="color: red;"> *</span><br/>
-                        <input type="text" id="data_3" name="data_3" style="width : 400px;" class="form-control"/>
+                        <input type="text" id="name" name="name" style="width : 400px;" class="form-control"/>
                         </div>
                         <div style="padding-bottom: 18px;">Phone<span style="color: red;"> *</span><br/>
-                        <input type="text" id="data_4" name="data_4" style="width : 400px;" class="form-control"/>
+                        <input type="text" id="phone" name="phone" style="width : 400px;" class="form-control"/>
                         </div>
                         <div style="padding-bottom: 18px;">Email<br/>
-                        <input type="text" id="data_5" name="data_5" style="width : 400px;" class="form-control"/>
+                        <input type="text" id="email" name="email" style="width : 400px;" class="form-control"/>
                         </div>
                         <div style="padding-bottom: 18px;">Date<span style="color: red;"> *</span><br/>
-                        <input type="text" id="data_6" name="data_6" style="width : 250px;" class="form-control"/>
+                        <input type="text" id="date" name="date" style="width : 250px;" class="form-control"/>
                         </div>
                         <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.4.0/pikaday.min.js" type="text/javascript"></script>
                         <link href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.4.0/css/pikaday.min.css" rel="stylesheet" type="text/css" />
-                        <script type="text/javascript">new Pikaday({ field: document.getElementById('data_6') });</script>
+                        <script type="text/javascript">new Pikaday({ field: document.getElementById('date') });</script>
                         <div style="padding-bottom: 18px;">Time<span style="color: red;"> *</span><br/>
-                        <input type="text" id="data_7" name="data_7" style="width : 250px;" class="form-control"/>
+                          <input class="form-control" name="time" id="time" style="width : 250px;"
+                          type="text" id="datetime" />
                         </div>
                         <div style="padding-bottom: 18px;">Number of Attendees<span style="color: red;"> *</span><br/>
-                        <select id="data_8" name="data_8" style="width : 250px;" class="form-control"><option>1</option>
+                        <select id="data_8" name="noofattendees" style="width : 250px;" class="form-control"><option>1</option>
                         <option>2</option>
                         <option>3</option>
                         <option>4</option>
@@ -66,7 +81,7 @@
                         </select>
                         </div>
                         <div style="padding-bottom: 18px;">Comments / Additional Requests<br/>
-                        <textarea id="data_9" false name="data_9" style="width : 400px;" rows="6" class="form-control"></textarea>
+                        <textarea id="data_9" false name="additionalrequests" style="width : 400px;" rows="6" class="form-control"></textarea>
                         </div>
                         <div style="padding-bottom: 18px;"><input name="skip_Submit" value="Submit" type="submit"/></div>
                         <div>
@@ -81,21 +96,21 @@
         </div>
     </div>
         
-        <script type="text/javascript">
+<script type="text/javascript">
         function validateForm() {
-        if (isEmpty(document.getElementById('data_3').value.trim())) {
+        if (isEmpty(document.getElementById('name').value.trim())) {
         alert('Name is required!');
         return false;
         }
-        if (!validateEmail(document.getElementById('data_5').value.trim())) {
+        if (!validateEmail(document.getElementById('email').value.trim())) {
         alert('Email must be a valid email address!');
         return false;
         }
-        if (isEmpty(document.getElementById('data_6').value.trim())) {
+        if (isEmpty(document.getElementById('date').value.trim())) {
         alert('Date is required!');
         return false;
         }
-        if (isEmpty(document.getElementById('data_7').value.trim())) {
+        if (isEmpty(document.getElementById('time').value.trim())) {
         alert('Time is required!');
         return false;
         }
@@ -106,6 +121,45 @@
         var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,15}(?:\.[a-z]{2})?)$/i;
         return isEmpty(email) || re.test(email);
         }
-        </script>
+
+        $(function() {
+            $("#reservation-form").submit(function(e) {
+        
+            e.preventDefault();
+            if(!validateForm()){
+              return;
+            }else{
+                var name = $("input[name='name']",this).val();
+                var phone = $("input[name='phone']",this).val();
+                var date = new Date($("input[name='date']",this).val()).valueOf() ;
+                var email = $("input[name='email']",this).val();
+                var time = $("input[name='time']",this).val();
+                var noofattendees = $("select[name='noofattendees']",this).val();
+                var additionalreq = $("textarea[name='additionalrequests']",this).val()
+                var additionalrequests = additionalreq===undefined?"":additionalreq;
+                var data = {"name":name, "phone":phone, "reservationDate":date,"email":email,"time":time,"numberOfAttendees":noofattendees,
+                "additionalRequests":additionalrequests};
+
+                $.ajax({
+                    url: "http://localhost:8090/restaurant/reservation/book-reservation",
+                    type: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: (response) => {
+                        alert("Reservation made successfully!!!")
+                    },
+                    error:(e)=>{
+                        console.log(e);
+                    alert("Something went wrong.");
+                    }
+                  });
+               }
+            });
+          });
+
+          $('#time').datetimepicker({
+              format: 'hh:mm a'
+          });
+</script>
 </body>
 </html>
