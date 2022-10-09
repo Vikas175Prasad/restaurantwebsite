@@ -13,6 +13,132 @@
    <script src="https://kit.fontawesome.com/a740978d7b.js" crossorigin="anonymous"></script>
    <link rel="stylesheet" href="../Css/navbar.css">
     <title>Menu</title>
+    <script>
+
+    
+    var cartItems = [];
+    var cartTotal = 0;
+    $(document).ready(function(){
+        if(localStorage.getItem("cartitems")!== undefined && localStorage.getItem("cartitems")!== null){
+        cartItems = JSON.parse(localStorage.getItem("cartitems"));
+        cartTotal = parseInt(localStorage.carttotal);
+        displayCart(cartItems);
+    }
+    })
+    
+    function addtoCart(dishnameordered, price){
+
+        if(cartItems.length>0){
+            let dishExist = false;
+            for(let i=0; i<cartItems.length;i++){
+                if(cartItems[i].dishname===dishnameordered){
+                    let dishObj = cartItems[i];
+                    dishObj.quantity = dishObj.quantity+1;
+                    dishObj.totalPrice = dishObj.totalPrice+price;
+                    cartItems[i] = dishObj;
+                    dishExist = true;
+                    cartTotal = cartTotal + price;
+                }
+            }
+
+            if(!dishExist){
+                let dishObj = {
+                    dishname:dishnameordered,
+                    quantity: 1,
+                    totalPrice: price
+                }
+                cartItems.push(dishObj);
+                cartTotal = cartTotal + price;
+            }
+
+            
+        }else{
+            //If cart is empty
+            let dishObj = {
+                    dishname:dishnameordered,
+                    quantity: 1,
+                    totalPrice: price
+            }
+            cartItems.push(dishObj);
+            cartTotal = cartTotal + price;
+        }
+
+        displayCart(cartItems);
+
+        localStorage.setItem("cartitems", JSON.stringify(cartItems));
+        localStorage.carttotal= cartTotal;
+    }
+
+    function displayCart(cartItems){
+        
+        let cartItemsDiv = document.getElementById("cart-items");
+        cartItemsDiv.innerHTML = '';
+        let target = document.querySelector("#cart-items");
+        for(let i=0;i<cartItems.length;i++){
+        
+        let box = document.createElement('div');
+        box.className = "cart-item d-flex justify-content-between text-capitalize my-3";
+        let itemText = document.createElement('div');
+        itemText.className = "item-text";
+        let pCard = document.createElement('p');
+        pCard.className = "font-weight-bold mb-0";
+        pCard.innerText = cartItems[i].dishname;
+        let spanRupee = document.createElement('span');
+        spanRupee.className = "cart-item-price";
+        spanRupee.innerText = '₹ '+cartItems[i].totalPrice;
+
+        let anchor = document.createElement('a');
+        anchor.href = "#!";
+        anchor.className = "cart-item-remove";
+        anchor.setAttribute("onclick", "deleteItem('"+cartItems[i].dishname+"')");
+        anchor.innerHTML = '<i class="fas fa-trash text-dark"></i>'
+        itemText.appendChild(pCard);
+        itemText.appendChild(spanRupee);
+        box.appendChild(itemText);
+        box.appendChild(anchor);
+        target.appendChild(box);
+     }
+
+     var cartTotalElement = $('#cart-total');
+     cartTotalElement.html(cartTotal);
+    }
+
+    function deleteItem(dishToDelete) { 
+        for(let i=0; i<cartItems.length;i++){
+
+            if(cartItems[i].dishname === dishToDelete){
+                cartTotal = cartTotal - cartItems[i].totalPrice;
+                cartItems.splice(i,1);
+                
+            }
+        }
+        localStorage.setItem("cartitems", JSON.stringify(cartItems));
+        localStorage.carttotal= cartTotal;
+        displayCart(cartItems);
+     }
+
+     function clearCart() {
+
+        cartItems = [];
+        cartTotal = 0;
+        localStorage.removeItem("cartitems");
+        localStorage.removeItem("carttotal");
+        displayCart(cartItems);
+
+     }
+
+
+     function checkOut(){
+        if(localStorage.getItem("loggedInUser")===undefined || localStorage.getItem("loggedInUser")===null){
+            alert("Please login first to checkout.....")
+        }else if(cartItems.length<=0){
+            alert("Please add some dishes in cart first.....")
+        }else{
+            window.location.href = 'checkout.html';
+        }
+     }
+
+    </script>
 </head>
 <body>
     <!-- navigation -->
@@ -52,7 +178,7 @@
                 <div class="menu-content">
                     <h4>Chaat Papdi<span>₹40</span></h4>
                     <p>Fried papdi mixed with onions, tomatoes, mint, tamarind & yogurt</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Chaat Papdi', 40)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -60,15 +186,15 @@
                 <div class="menu-content">
                     <h4>Chana Chat<span>₹40</span></h4>
                     <p>Chickpeas mixed with onions, tomatoes, mint, tamarind & yogurt</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Chana Chat', 40)">Add to Cart</button></a>
                 </div>
             </div>
-            <div class="single-menu">
+            <!-- <div class="single-menu">
                 <img src="../Images/breakfast/aloo-paratha-500x500.jpg" alt="">
                 <div class="menu-content">
                     <h4>Vegetable Pakoda<span>₹30</span></h4>
                     <p>Mixed vegetables dipped in chickpea batter and deep fried "V" & "GF"</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#"><button class="btnn" onclick="addtoCart('Vegetable Pakoda', 30)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -76,7 +202,7 @@
                 <div class="menu-content">
                     <h4>Vegetable Samosa<span>₹40</span></h4>
                     <p>Flaky pastry filled with seasoned potatoes & peas (2 pieces) "V"</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#"><button class="btnn" onclick="addtoCart('Vegetable Samosa', 40)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -84,7 +210,7 @@
                 <div class="menu-content">
                     <h4>Paneer Pakoda<span>₹40</span></h4>
                     <p>Homemade cheese dipped in chickpea batter and fried</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#"><button class="btnn" onclick="addtoCart('Paneer Pakoda', 40)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -92,9 +218,9 @@
                 <div class="menu-content">
                     <h4>Mixed Platter<span>₹100</span></h4>
                     <p>Samosa, vegetables, chicken, paneer, shrimp pakora & papadom (2 pieces of each)</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#"><button class="btnn" onclick="addtoCart('Paneer Pakoda', 100)">Add to Cart</button></a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="wrapper" id="menucontent">
@@ -107,7 +233,7 @@
                 <div class="menu-content">
                     <h4>Assorted Condiments<span>₹25(each)</span></h4>
                     <p>Mixed Pickle, Green Chutney, Red Onion Chutney, Mango Chutney or Tamarind Chutney</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Assorted Condiments', 25)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -115,10 +241,10 @@
                 <div class="menu-content">
                     <h4>Papadom<span>₹40</span></h4>
                     <p>(4 pieces) Lentil wafer "V" & "GF"</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Papadom', 40)">Add to Cart</button></a>
                 </div>
             </div>
-            <div class="single-menu">
+            <!-- <div class="single-menu">
                 <img src="../Images/breakfast/aloo-paratha-500x500.jpg" alt="">
                 <div class="menu-content">
                     <h4>Raita<span>₹40</span></h4>
@@ -141,7 +267,7 @@
                     <p>Extra Boiled Rice </p>
                     <a href="#"><button class="btnn">Add to Cart</button></a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="wrapper" id="menucontent">
@@ -154,7 +280,7 @@
                 <div class="menu-content">
                     <h4>Lentil Soup<span>₹60</span></h4>
                     <p>Red lentil sauce with fresh cream</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Lentil Soup', 60)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -162,7 +288,7 @@
                 <div class="menu-content">
                     <h4>Tomato Soup<span>₹60</span></h4>
                     <p>Fresh tomato sauce with fresh cream</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Tomato Soup', 60)">Add to Cart</button></a>
                 </div>
             </div>
         </div>
@@ -177,7 +303,7 @@
                 <div class="menu-content">
                     <h4>Tandoori Chicken<span>₹140</span></h4>
                     <p>Half chicken marinated in yogurt and mild spices</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Tandoori Chicken', 140)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -185,10 +311,10 @@
                 <div class="menu-content">
                     <h4>Chicken Tikka<span>₹150</span></h4>
                     <p>	Boneless chicken marinated in yogurt and mild spices</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Chicken Tikka', 150)">Add to Cart</button></a>
                 </div>
             </div>
-            <div class="single-menu">
+            <!-- <div class="single-menu">
                 <img src="../Images/breakfast/aloo-paratha-500x500.jpg" alt="">
                 <div class="menu-content">
                     <h4>Chicken Malai Kabab<span>₹160</span></h4>
@@ -235,7 +361,7 @@
                     <p>	2 kinds of chicken and lamb & 2 pieces of shrimp</p>
                     <a href="#"><button class="btnn">Add to Cart</button></a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="wrapper" id="menucontent">
@@ -248,7 +374,7 @@
                 <div class="menu-content">
                     <h4>Special Dinner for Two<span>₹400</span></h4>
                     <p>Tandoori chicken, shrimp, lamb kabab, seekh kabab, choice of one curry, choice of one bread and basmati rice</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Special Dinner for Two', 400)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -256,7 +382,7 @@
                 <div class="menu-content">
                     <h4>Special Vegetarian Dinner for Two<span>₹380</span></h4>
                     <p>Choice of two vegetable curries, choice of one bread and basmati rice</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Special Dinner for Two', 380)">Add to Cart</button></a>
                 </div>
             </div>
         </div>
@@ -271,7 +397,7 @@
                 <div class="menu-content">
                     <h4>Gobi Manchurian<span>₹130</span></h4>
                     <p>Batter-fried cauliflower tossed in Manchurian sauce, dry or with gravy</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Gobi Manchurian', 130)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -279,10 +405,10 @@
                 <div class="menu-content">
                     <h4>Chicken Manchurian<span>₹140</span></h4>
                     <p>Batter-fried chicken tossed in Manchurian sauce, dry or with gravy</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Chicken Manchurian', 140)">Add to Cart</button></a>
                 </div>
             </div>
-            <div class="single-menu">
+            <!-- <div class="single-menu">
                 <img src="../Images/breakfast/aloo-paratha-500x500.jpg" alt="">
                 <div class="menu-content">
                     <h4>Paneer Tikka Masala<span>₹160</span></h4>
@@ -297,7 +423,7 @@
                     <p>Homemade cheese cooked in onion sauce, tomatoes, bell peppers & ginger</p>
                     <a href="#"><button class="btnn">Add to Cart</button></a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="wrapper" id="menucontent">
@@ -310,7 +436,7 @@
                 <div class="menu-content">
                     <h4>Vegetable Biryani<span>₹140</span></h4>
                     <p>Fresh vegetables in a lightly spiced sauce, with herbs, baked with basmati rice</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Vegetable Biryani', 140)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -318,10 +444,10 @@
                 <div class="menu-content">
                     <h4>Chicken Biryani<span>₹150</span></h4>
                     <p>	Boneless chicken in a ligthly spiced sauce, with herbs, baked with basmati rice</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Chicken Biryani', 150)">Add to Cart</button></a>
                 </div>
             </div>
-            <div class="single-menu">
+            <!-- <div class="single-menu">
                 <img src="../Images/breakfast/aloo-paratha-500x500.jpg" alt="">
                 <div class="menu-content">
                     <h4>Lamb Biryani<span>₹180</span></h4>
@@ -336,7 +462,7 @@
                     <p>Fish sautéed in a lightly spiced sauce, with herbs, baked with basmati rice</p>
                     <a href="#"><button class="btnn">Add to Cart</button></a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="wrapper" id="menucontent">
@@ -349,7 +475,7 @@
                 <div class="menu-content">
                     <h4>Mixed Vegetable Curry<span>₹120</span></h4>
                     <p>Seasonal vegetables cooked with curry sauce "V"</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Mixed Vegetable Curry', 120)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -357,10 +483,10 @@
                 <div class="menu-content">
                     <h4>Dal Tadka<span>₹120</span></h4>
                     <p>Red lentils cooked with onion & tomatoes "V"</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Dal Tadka', 120)">Add to Cart</button></a>
                 </div>
             </div>
-            <div class="single-menu">
+            <!-- <div class="single-menu">
                 <img src="../Images/breakfast/aloo-paratha-500x500.jpg" alt="">
                 <div class="menu-content">
                     <h4>Mixed Vegetable Vindaloo<span>₹120</span></h4>
@@ -503,7 +629,7 @@
                     <p>Cubed cheese cooked with onion sauce, tomatoes and bell peppers</p>
                     <a href="#"><button class="btnn">Add to Cart</button></a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="wrapper" id="menucontent">
@@ -516,7 +642,7 @@
                 <div class="menu-content">
                     <h4>Naan<span>₹30</span></h4>
                     <p>	Traditional Indian white flour hand tossed bread</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Naan', 30)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -524,10 +650,10 @@
                 <div class="menu-content">
                     <h4>Roti<span>₹30</span></h4>
                     <p>	Whole wheat bread</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Roti', 30)">Add to Cart</button></a>
                 </div>
             </div>
-            <div class="single-menu">
+            <!-- <div class="single-menu">
                 <img src="../Images/breakfast/aloo-paratha-500x500.jpg" alt="">
                 <div class="menu-content">
                     <h4>Paratha<span>₹40</span></h4>
@@ -614,7 +740,7 @@
                     <p>Naan, Garlic Naan, Cheese Naan</p>
                     <a href="#"><button class="btnn">Add to Cart</button></a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="wrapper" id="menucontent">
@@ -627,7 +753,7 @@
                 <div class="menu-content">
                     <h4>Gulab Jamun<span>₹40</span></h4>
                     <p>Deep fried milk confection in a sweet syrup (3 pieces)</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Gulab Jamun', 40)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -635,10 +761,10 @@
                 <div class="menu-content">
                     <h4>Kheer<span>₹40</span></h4>
                     <p>Rice cooked in flavored milk with nuts and cardamon, served cold</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Kheer', 40)">Add to Cart</button></a>
                 </div>
             </div>
-            <div class="single-menu">
+            <!-- <div class="single-menu">
                 <img src="../Images/breakfast/aloo-paratha-500x500.jpg" alt="">
                 <div class="menu-content">
                     <h4>Kulfi<span>₹40</span></h4>
@@ -661,7 +787,7 @@
                     <p>Grated carrots cooked in milk and butter</p>
                     <a href="#"><button class="btnn">Add to Cart</button></a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="wrapper" id="menucontent">
@@ -674,7 +800,7 @@
                 <div class="menu-content">
                     <h4>Mango Lassi<span>₹50</span></h4>
                     <p>Cold sweetened mango and yogurt drink</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Mango Lassi', 50)">Add to Cart</button></a>
                 </div>
             </div>
             <div class="single-menu">
@@ -682,10 +808,10 @@
                 <div class="menu-content">
                     <h4>Sweet Lassi<span>₹40</span></h4>
                     <p>Cold sweetened yogurt drink</p>
-                    <a href="#"><button class="btnn">Add to Cart</button></a>
+                    <a href="#!"><button class="btnn" onclick="addtoCart('Sweet Lassi', 40)">Add to Cart</button></a>
                 </div>
             </div>
-            <div class="single-menu">
+            <!-- <div class="single-menu">
                 <img src="../Images/breakfast/aloo-paratha-500x500.jpg" alt="">
                 <div class="menu-content">
                     <h4>Mango Juice<span>₹30</span></h4>
@@ -724,7 +850,7 @@
                     <p></p>
                     <a href="#"><button class="btnn">Add to Cart</button></a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <!-- Cart -->
@@ -733,7 +859,10 @@
             <h1>Cart Items</h1>
             <div id="cart" class="cart">
                 <!-- cart item -->
-                <div class="cart-item d-flex justify-content-between text-capitalize my-3">
+                <div id="cart-items">
+
+                </div>
+                <!-- <div class="cart-item d-flex justify-content-between text-capitalize my-3">
                   <div class="item-text">
                     <p id="cart-item-title" class="font-weight-bold mb-0">Coke</p>
                     <span>₹</span>
@@ -742,10 +871,10 @@
                   <a href="" id='cart-item-remove' class="cart-item-remove">
                     <i class="fas fa-trash text-dark"></i>
                   </a>
-                </div>
+                </div> -->
                 <!--end of  cart item -->
                 <!-- cart item -->
-                <div class="cart-item d-flex justify-content-between text-capitalize my-3">
+                <!-- <div class="cart-item d-flex justify-content-between text-capitalize my-3">
                   <div class="cart-item-text">
                     <p id="cart-item-title" class="font-weight-bold mb-0">Paneer Paratha</p>
                     <span>₹</span>
@@ -754,19 +883,19 @@
                   <a href="" id='cart-item-remove' class="cart-item-remove">
                     <i class="fas fa-trash text-dark"></i>
                   </a>
-                </div>
+                </div> -->
                 <!--end of  cart item -->
                 <!-- cart total -->
                 <hr>
                 <div class="cart-total-container d-flex justify-content-around text-capitalize">
                   <h5>total</h5>
-                  <h5> ₹ <strong id="cart-total" class="font-weight-bold">60</strong> </h5>
+                  <h5> ₹ <strong id="cart-total" class="font-weight-bold">0</strong> </h5>
                 </div>
                 <!--end cart total -->
                 <!-- cart buttons -->
                 <div class="cart-buttons-container mt-3 d-flex justify-content-between">
-                  <a href="#" id="clear-cart" class="btn btn-outline-secondary btn-black text-uppercase">clear cart</a>
-                  <a href="../Html/checkout.html" class="btn btn-outline-secondary text-uppercase btn-pink">checkout</a>
+                  <a href="#!" id="clear-cart" class="btn btn-outline-secondary btn-black text-uppercase" onclick="clearCart()">clear cart</a>
+                  <a href="#!" class="btn btn-outline-secondary text-uppercase btn-pink" onclick="checkOut()">checkout</a>
                 </div>
             </div>
         </div>

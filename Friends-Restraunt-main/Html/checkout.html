@@ -28,6 +28,59 @@
             padding: 5px;
         }
     </style>
+    <script>
+      var amt = 0;
+      $(document).ready(function(){
+
+        let userDetails  = JSON.parse(localStorage.getItem("loggedInUser"));
+
+        amt = localStorage.carttotal;
+        var paymentAmt = $('#payment-amount');
+        paymentAmt.html('<b>Please pay exactly ₹ '+ amt+ ' and enter transaction id below');
+      })
+
+
+      $(function() {
+      $("#checkout-form").submit(function(e) {
+
+        e.preventDefault();
+        var firstname = $("input[name='firstname']",this).val();
+        var lastname = $("input[name='lastname']",this).val();
+        var email = $("input[name='email']",this).val();
+        var address = $("input[name='address']",this).val();
+        var country = $("select[name='country']",this).val();
+        var state = $("select[name='state']",this).val();
+        var zip = $("input[name='zip']",this).val();
+        var transactionid = $("input[name='transactionid']",this).val();
+
+        var data = {"firstname":firstname, "lastname":lastname, "email":email,
+      "address":address, "country" : country, "state": state , "zip":zip, "transactionid": transactionid,
+    "orderamount":amt, ordereddishes:JSON.parse(localStorage.getItem("cartitems"))}
+
+      console.log(data);
+
+        $.ajax({
+          url: "http://localhost:8090/order/place_order",
+          type: 'post',
+          contentType: 'application/json',
+          data: JSON.stringify(data),
+          success: (response) => {
+            console.log(response);
+            alert("Order placed successfully with order id #"+response.orderId+
+            " . We will verify payment information and update the delivery status through mail. Thanks!!!");
+            window.location.href = 'Menu.html';
+            localStorage.removeItem("cartitems");
+            localStorage.carttotal = 0;
+          },
+          error:(e)=>{
+            console.log(e);
+            alert("Something went wrong.");
+          }
+        });
+      });
+    });
+
+    </script>
 </head>
 <body>
     <nav class="navbar top">
@@ -51,7 +104,7 @@
           <div class="card">
 
             <!--Card content-->
-            <form class="card-body">
+            <form class="card-body" id="checkout-form">
 
               <!--Grid row-->
               <div class="row">
@@ -61,7 +114,7 @@
 
                   <!--firstName-->
                   <div class="md-form ">
-                    <input type="text" id="firstName" class="form-control">
+                    <input name="firstname" required type="text" id="firstName" class="form-control">
                     <label for="firstName" class="">First name</label>
                   </div>
 
@@ -73,7 +126,7 @@
 
                   <!--lastName-->
                   <div class="md-form">
-                    <input type="text" id="lastName" class="form-control">
+                    <input name="lastname" required type="text" id="lastName" class="form-control">
                     <label for="lastName" class="">Last name</label>
                   </div>
 
@@ -85,21 +138,21 @@
 
               <!--email-->
               <div class="md-form mb-5">
-                <input type="text" id="email" class="form-control" placeholder="youremail@example.com">
-                <label for="email" class="">Email (optional)</label>
+                <input type="text" required name="email" id="email" class="form-control" placeholder="youremail@example.com">
+                <label for="email" class="">Email</label>
               </div>
 
               <!--address-->
               <div class="md-form mb-5">
-                <input type="text" id="address" class="form-control" placeholder="1234 Main St">
+                <input type="text" required name="address" id="address" class="form-control" placeholder="1234 Main St">
                 <label for="address" class="">Address</label>
               </div>
 
               <!--address-2-->
-              <div class="md-form mb-5">
+              <!-- <div class="md-form mb-5">
                 <input type="text" id="address-2" class="form-control" placeholder="Apartment or suite">
                 <label for="address-2" class="">Address 2 (optional)</label>
-              </div>
+              </div> -->
 
               <!--Grid row-->
               <div class="row">
@@ -108,7 +161,7 @@
                 <div class="col-lg-4 col-md-12 mb-4">
 
                   <label for="country">Country</label>
-                  <select class="custom-select d-block w-100" id="country" required>
+                  <select name="country" class="custom-select d-block w-100" id="country" required>
                     <option value="">Choose...</option>
                     <option>India</option>
                   </select>
@@ -123,7 +176,7 @@
                 <div class="col-lg-4 col-md-6 mb-4">
 
                   <label for="state">State</label>
-                  <select class="custom-select d-block w-100" id="state" required>
+                  <select class="custom-select d-block w-100" id="state" name="state" required>
                     <option value="">Choose...</option>
                     <option>Delhi</option>
                     <option>Haryana</option>
@@ -148,7 +201,7 @@
                 <div class="col-lg-4 col-md-6 mb-4">
 
                   <label for="zip">Zip</label>
-                  <input type="text" class="form-control" id="zip" placeholder="" required>
+                  <input type="text" class="form-control" id="zip" name="zip" placeholder="" required>
                   <div class="invalid-feedback">
                     Zip code required.
                   </div>
@@ -159,16 +212,16 @@
               </div>
               <!--Grid row-->
 
-              <hr>
+              <!-- <hr>
 
               <div class="custom-control custom-checkbox">
                 <input type="checkbox" class="custom-control-input" id="same-address">
                 <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
               </div>
 
-              <hr>
+              <hr> -->
 
-              <div class="d-block my-3">
+              <!-- <div class="d-block my-3">
                 <div class="custom-control custom-radio">
                   <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" checked required>
                   <label class="custom-control-label" for="credit">Credit card / Debit card</label>
@@ -210,6 +263,14 @@
                     Security code required
                   </div>
                 </div>
+              </div> -->
+              <img src="../Images/amazon_qrcode.JPG" alt="qr_code" height="400" width="300" />
+              <div id="payment-amount"></div>
+              <div class="col-md-6 mb-2">
+
+                <label for="transactionid">Transaction Id</label>
+                <input name="transactionid" required type="text" name="transactionid" class="form-control" id="transactionid" placeholder="" required>
+
               </div>
               <hr class="mb-4">
               <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
